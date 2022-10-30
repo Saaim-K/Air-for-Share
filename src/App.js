@@ -42,9 +42,10 @@ function App() {
       });
     }
     // getData();
+    let unsubscribe=null
     const getRealTimeUpdates = async () => {
       const q = query(collection(db, "posts"));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      unsubscribe = onSnapshot(q, (querySnapshot) => {
         const posts = [];
         querySnapshot.forEach((doc) => {
           posts.push(doc.data());
@@ -54,6 +55,7 @@ function App() {
       });
     }
     getRealTimeUpdates();
+    return () => { unsubscribe() }
   }, [])
 
 
