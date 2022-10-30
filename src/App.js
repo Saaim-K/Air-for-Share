@@ -1,9 +1,8 @@
 import './App.css';
 import { useState, useEffect } from 'react';
+import moment from 'moment/moment';
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
-
-
+import { getFirestore, collection, query, addDoc, getDocs, doc, onSnapshot } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,11 +34,26 @@ function App() {
       const querySnapshot = await getDocs(collection(db, "posts"));
       querySnapshot.forEach((doc) => {
         console.log(`${doc.id} =>`, doc.data());
-        let newArray = [...posts, doc.data()]
-        setPosts(newArray)
+        let newArray = [...posts, doc.data()];
+        setPosts((prev) => {
+          let newArray = [...prev, doc.data()];
+          return newArray
+        })
       });
     }
-    getData();
+    // getData();
+    const getRealTimeUpdates = async () => {
+      const q = query(collection(db, "posts"));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+          posts.push(doc.data());
+        });
+        setPosts(posts)
+        console.log("posts: ", posts);
+      });
+    }
+    getRealTimeUpdates();
   }, [])
 
 
@@ -51,7 +65,7 @@ function App() {
     try {
       const docRef = await addDoc(collection(db, 'posts'), {//here posts is the name of the collection
         text: postText,
-        createdon: new Date().getTime()
+        createdOn: new Date().getTime()
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -74,7 +88,17 @@ function App() {
 
       <div>
 
-        {/* map */}
+        {posts.map((eachPost, i) => (
+          <div className='post' key={i}>
+            <h3 className='title' href={eachPost?.url}
+              target="_blank" rel="noreferrer">
+              {eachPost?.text}
+            </h3>
+            <span>{
+              moment(eachPost?.datePublished).format('Do MMMM,h:mm a')
+            }</span>
+          </div>
+        ))}
 
       </div>
     </>
