@@ -1,19 +1,18 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
 
 
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC2U_D5BiQP7-a27Ah-JrIZ9CracDABau4",
-  authDomain: "crud-52601.firebaseapp.com",
-  projectId: "crud-52601",
-  storageBucket: "crud-52601.appspot.com",
-  messagingSenderId: "253797641341",
-  appId: "1:253797641341:web:67aebc3b62af9074931514"
+  apiKey: "AIzaSyBz2DKzulwaGrVco27Ox0bhbAZ_Mn4IOq0",
+  authDomain: "crud-39371.firebaseapp.com",
+  projectId: "crud-39371",
+  storageBucket: "crud-39371.appspot.com",
+  messagingSenderId: "1029686903261",
+  appId: "1:1029686903261:web:b7d39c4c9d605a26527634"
 };
 
 // Initialize Firebase
@@ -26,25 +25,39 @@ const db = getFirestore(app);
 
 function App() {
   const [postText, setPostText] = useState('')
-  const [post, setPost] = useState([])
+  const [posts, setPosts] = useState([])
+
+
+
 
   useEffect(() => {
-
+    const getData = async () => {
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} =>`, doc.data());
+        let newArray = [...posts, doc.data()]
+        setPosts(newArray)
+      });
+    }
+    getData();
   }, [])
+
+
 
   const savePost = async (e) => {
     e.preventDefault();
+    console.log('post', postText);
 
     try {
-      const docRef = await addDoc(collection(db, "users"), {
+      const docRef = await addDoc(collection(db, 'posts'), {//here posts is the name of the collection
         text: postText,
-        createdOn: new Date().getTime(),
+        createdon: new Date().getTime()
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
-    console.log('post', postText);
+
   }
 
   return (
