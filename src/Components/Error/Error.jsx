@@ -1,11 +1,10 @@
 import React from 'react'
-import './Error.css'
 
 function Error() {
     return (
-       <>
-       Error 404 PAge Not FOund
-       </>
+        <>
+            Error 404 PAge Not FOund
+        </>
     )
 }
 
